@@ -16,7 +16,6 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Media.Capture;
 using Windows.Storage;
-using GazeInput;
 
 namespace Pilot37_RCCar
 {
@@ -26,7 +25,6 @@ namespace Pilot37_RCCar
 
     public static class Globals
     {
-        public static GazePointer _gaze;
         public static Visibility _donut = Visibility.Collapsed;
         public static Visibility _wave = Visibility.Collapsed;
         public static bool _personality = false;
@@ -141,16 +139,6 @@ namespace Pilot37_RCCar
             // Set up the a GazePointer object and make it visible on screen
             if (Globals._firstTimeHere)
             {
-                // TODO: Initilize with "this" and create a new GazePointer on each Page Navigation
-                //    - This is in accordance with the standard programming patterns of Eye Gaze projects
-                Globals._gaze = new GazePointer(Window.Current.Content);
-                Globals._gaze.CursorRadius = 6;
-                Globals._gaze.IsCursorVisible = true;
-                Globals._gaze.Filter = new OneEuroFilter();
-
-                Globals._gaze.GazePointerEvent += OnGazePointerEvent;
-                Globals._gaze.EyesOffDelay = 250000;
-
                 PullSettingsFromStorage();
             }
 
@@ -384,10 +372,6 @@ namespace Pilot37_RCCar
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (!Globals._firstTimeHere)
-            {
-                Globals._gaze.GazePointerEvent += OnGazePointerEvent;
-            }
 
             _controlsEnabled = Globals._controlsEnabledPrev;
             Debug.WriteLine($"_controlsEnabled: {_controlsEnabled}");
@@ -423,7 +407,6 @@ namespace Pilot37_RCCar
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            Globals._gaze.GazePointerEvent -= OnGazePointerEvent;
             Globals._controlsEnabledPrev = _controlsEnabled;
             _controlsEnabled = false;
             Globals.bleWatch1.Stop();
@@ -578,49 +561,6 @@ namespace Pilot37_RCCar
         }
 
         #region Button Handling
-        // Button interactivity for Eye Gaze
-        private void OnGazePointerEvent(GazePointer sender, GazePointerEventArgs ea)
-        {
-            // Figure out what part of the GUI is currently being gazed upon
-            UIElement _temp = ea.HitTarget;
-            var _button = _temp as Button;
-
-            // Eyes Off event
-            if (_temp == null && _controlsEnabled)
-            {
-                Debug.WriteLine("Eyes Off Event!");
-                Stop();
-            }
-            // Button Selection event
-            else if (_button != null)
-            {
-                switch (ea.State)
-                {
-                    case GazePointerState.Fixation:
-                        if (_button.Equals(PauseButton) || _button.Equals(SettingsButton) || _button.Equals(ExitButton))
-                        {
-                            return;
-                        }
-                        Button_Handler(_button);
-                        break;
-                    case GazePointerState.Dwell:
-                        switch (_button.Name)
-                        {
-                            case "PauseButton":
-                                PausePress();
-                                break;
-                            case "SettingsButton":
-                                SettingsPress();
-                                break;
-                            case "ExitButton":
-                                ExitPress();
-                                break;
-                        }
-                        break;
-                }
-            }
-        }
-
         // Button interactivity for standard mouse click
         private void Button_Click(object sender, RoutedEventArgs e)
         {

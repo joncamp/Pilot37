@@ -5,7 +5,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using GazeInput;
 
 
 namespace Pilot37_RCCar
@@ -46,7 +45,6 @@ namespace Pilot37_RCCar
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Globals._gaze.GazePointerEvent += OnGazePointerEvent;
             // Update the Settings from the Global class of values
             //     - Especially useful when starting a new session to restore previous values
             TextBlock_FastForwardValue.Text = Globals._fastForwardSetting;
@@ -64,50 +62,7 @@ namespace Pilot37_RCCar
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            Globals._gaze.GazePointerEvent -= OnGazePointerEvent;
             base.OnNavigatedFrom(e);
-        }
-
-        // Button interactivity for Eye Gaze
-        private void OnGazePointerEvent(GazePointer sender, GazePointerEventArgs ea)
-        {
-            // Figure out what part of the GUI is currently being gazed upon
-            UIElement _temp = ea.HitTarget;
-
-            // Eyes Off event
-            if (_temp == null)
-            {
-                Debug.WriteLine("Settings: Eyes Off Event!");
-            }
-            // Button Selection event
-            var _button = _temp as Button;
-            if (_button != null)
-            {
-                switch (ea.State)
-                {
-                    case GazePointerState.Fixation:
-                        if (_button.Equals(ExitButton) || _button.Equals(SaveButton) || _button.Equals(CloseButton))
-                        {
-                            return;
-                        }
-                        Button_Handler(_button);
-                        break;
-                    case GazePointerState.Dwell:
-                        switch (_button.Name)
-                        {
-                            case "ExitButton":
-                                StateChange(ControlStates.Goodbye, ExitPress, _button);
-                                break;
-                            case "CloseButton":
-                                StateChange(ControlStates.Goodbye, ClosePress, _button);
-                                break;
-                            case "SaveButton":
-                                StateChange(ControlStates.Default, SavePress, _button);
-                                break;
-                        }
-                        break;
-                }
-            }
         }
 
         // Button interactivity for standard mouse clicks
