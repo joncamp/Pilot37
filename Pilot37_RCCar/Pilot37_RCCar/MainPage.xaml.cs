@@ -131,7 +131,7 @@ namespace Pilot37_RCCar
             Loaded += MainPage_OnLoaded;
             Application.Current.Resuming += Application_Resuming;
             Application.Current.Suspending += Application_Suspending;
-            Application.Current.UnhandledException += new UnhandledExceptionEventHandler(Application_CatchUnhandledException);
+            Application.Current.UnhandledException += new Windows.UI.Xaml.UnhandledExceptionEventHandler(Application_CatchUnhandledException);
         }
 
         private void MainPage_OnLoaded(object sender, RoutedEventArgs e)
@@ -271,7 +271,7 @@ namespace Pilot37_RCCar
             DisconnectFromBLE();
         }
 
-        private void Application_CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void Application_CatchUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             Exception _exc = e.Exception;
             Debug.WriteLine("\nUnhandled Exception Caught!");

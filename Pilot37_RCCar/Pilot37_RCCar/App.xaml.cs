@@ -35,7 +35,7 @@ namespace Pilot37_RCCar
             //this.UnhandledException += new UnhandledExceptionEventHandler(App_UnhandledException);
         }
 
-        private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void App_UnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             Debug.WriteLine("UNHANDLED BABABABA");
         }
