@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Diagnostics;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Devices.Bluetooth;
@@ -21,19 +13,11 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Media.Capture;
 using Windows.Storage.Streams;
-using GazeInput;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace Pilot37_App
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
-        private GazePointer _gaze;
-
         private BluetoothLEAdvertisementWatcher bleWatch1, bleWatch2;
         private MediaCapture _mediaCapture;
         private DeviceInformation _fpvDevice1;
@@ -42,7 +26,6 @@ namespace Pilot37_App
         private GattDeviceServicesResult _nordicServices = null;
         private GattCharacteristicsResult _nordicChars = null;
         private GattReadResult _nordicReadVal = null;
-        private static Button _previous;
 
         SolidColorBrush _navDefault = new SolidColorBrush(Colors.AliceBlue);
         SolidColorBrush _sideDefault = new SolidColorBrush(Colors.Blue);
@@ -52,89 +35,11 @@ namespace Pilot37_App
         private bool _hrmInitialized = false;
         private bool _hrmDisplay = false;
 
-
-
         public MainPage()
         {
             InitializeComponent();
-            Loaded += new RoutedEventHandler(MainPage_OnLoaded);
             Application.Current.Resuming += Application_Resuming;
         }
-
-        private void MainPage_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            // Set up the a GazePointer object and make it visible on screen
-            _gaze = new GazePointer(this);
-            _gaze.CursorRadius = 6;
-            _gaze.IsCursorVisible = true;
-
-            _gaze.GazePointerEvent += OnGazePointerEvent;
-        }
-
-        #region Gaze Event
-        private void OnGazePointerEvent(GazePointer sender, GazePointerEventArgs ea)
-        {
-            // Figure out what part of the GUI is currently being gazed upon
-            UIElement _temp = ea.HitTarget;
-
-            // When a new GazePointerEvent occurs, revert the previously selected object to its default (ie, non-gazed upon) appearance
-            if (_previous != null)
-            {
-                if (_previous.Name.Equals("TestButton") || _previous.Name.Equals("SettingsButton"))
-                {
-                    _previous.Background = _sideDefault;
-                } else
-                {
-                    _previous.Background = _navDefault;
-                }
-            }
-
-            // Pass the button that was selected to the event handler to determine the appropriate action
-            if (_temp.ToString().Contains("Button"))
-            {
-                Button _button = (Button)ea.HitTarget;
-                GazeButton_Handler(_button);
-            }
-
-        }
-
-        private void GazeButton_Handler(Button b)
-        {
-            // Highlight the button that is currently gazed upon, set _previous, and trigger the appropriate callback
-            b.Background = _gazedUpon;
-            _previous = b;
-
-            switch (b.Name)
-            {
-                case "ForwardButton":
-                    ForwardPress();
-                    break;
-                case "ForwardLeftButton":
-                    ForwardLeftPress();
-                    break;
-                case "ForwardRightButton":
-                    ForwardRightPress();
-                    break;
-                case "BackwardLeftButton":
-                    BackwardLeftPress();
-                    break;
-                case "BackwardRightButton":
-                    BackwardRightPress();
-                    break;
-                case "StopButton":
-                    b.Background = _gazedUponStop;
-                    StopPress();
-                    break;
-                case "ReverseButton":
-                    ReversePress();
-                    break;
-                case "TestButton":
-                    TestButtonPress();
-                    break;
-
-            }
-        }
-        #endregion
 
         private async void Application_Resuming(object sender, object o)
         {
